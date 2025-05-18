@@ -39,5 +39,11 @@ variable "lb_name" {
 }
 variable "elastic_search" {
   type    = string
-  default = "1068-2a00-a040-199-72e4-8ad3-cf1d-4a93-2d98.ngrok-free.app"
+  default = "172.30.20.131"
+}
+
+variable "log_stash" {
+  type    = string
+  default = "172.30.103.12"
+  
 }

@@ -10,8 +10,8 @@ data "aws_lb" "existing_alb" {
   name = var.lb_name
 }
 
-resource "aws_cloudwatch_log_group" "nginx_logs" {
-  name              = "/ecs/fluent-logs"
+resource "aws_cloudwatch_log_group" "batel_nginx_logs" {
+  name              = "/ecs/bit-batel-logs"
   retention_in_days = 7
 }
 
@@ -39,14 +39,13 @@ resource "aws_ecs_task_definition" "nginx_fluentbit" {
       logConfiguration = {
         logDriver = "awsfirelens"
         options = {
-          Name       = "es"
-          Host       = var.elastic_search
-          Port       = "443"
-          Index      = "nginx"
-          suppress_type_name = "true"  # Add this to suppress the _type parameter
-          tls        = "on"
+          Name   = "tcp"
+          Host   = var.log_stash  # IP פרטי של ה-EC2 עם Logstash
+          Port   = "5054"
+          Format = "json"         # זה מה ש-Fluent Bit ישלח
         }
       }
+
     },
     {
       name      = "log-router"
@@ -65,7 +64,7 @@ resource "aws_ecs_task_definition" "nginx_fluentbit" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          "awslogs-group"         = aws_cloudwatch_log_group.nginx_logs.name
+          "awslogs-group"         = aws_cloudwatch_log_group.batel_nginx_logs.name
           "awslogs-region"        = "il-central-1"
           "awslogs-stream-prefix" = "firelens"
         }
